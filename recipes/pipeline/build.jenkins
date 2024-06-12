@@ -10,6 +10,12 @@ pipeline {
                 }
             }
         }
+
+        tools {
+                // Ensure this matches the name configured in Global Tool Configuration
+                maven 'Maven 3.6.3'
+            }
+
         stage('Maven Build') {
             steps {
                 script {
