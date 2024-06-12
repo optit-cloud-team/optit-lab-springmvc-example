@@ -19,13 +19,8 @@ pipeline {
         stage('Maven Build') {
             steps {
                 script {
-                    sh "cd recipes && mvn clean install -X"
+                    sh "cd recipes && mvn clean package -DskipTests"
                 }
-            }
-        }
-        stage('Run') {
-            steps {
-                sh "cd recipes && nohup mvn spring-boot:run &"
             }
         }
         stage('Verify Dockerfile') {
@@ -36,23 +31,34 @@ pipeline {
                 }
             }
         }
-        stage('Build Docker Image') {
+        stage('Build Docker Images') {
             steps {
                 script {
-                    // Build Docker image using Dockerfile in the root of the recipes directory
-                    sh "docker build -t your-spring-boot-app -f recipes/Dockerfile recipes"
+                    // Navigate to the directory containing Dockerfiles
+                    dir('recipes') {
+                        // Build Docker images using Dockerfiles
+                        sh "docker build -f Dockerfilemysql -t bharathoptdocker/mysql:latest ."
+                        sh "docker build -f Dockerfile -t bharathoptdocker/my_spring_application:latest ."
+
+                        // List Docker images
+                        sh 'docker images'
+                    }
                 }
             }
         }
-        stage('Tag Docker Image') {
+        stage('Docker Publish') {
             steps {
                 script {
-                    sh "docker tag your-spring-boot-app raorajath/your-spring-boot-app:compose1"
+                    // Docker login using credentials
+                    withCredentials([usernamePassword(credentialsId: 'bkdockerid', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh 'echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin'
+                        sh 'docker push bharathoptdocker/mysql:latest'
+                        sh 'docker push bharathoptdocker/my_spring_application:latest'
+                    }
                 }
             }
         }
     }
-
     post {
         success {
             echo 'Pipeline executed successfully!'
