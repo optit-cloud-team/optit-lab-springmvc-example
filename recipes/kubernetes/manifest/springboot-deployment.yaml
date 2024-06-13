@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: springboot-app
-        image: <your-docker-repo>/springboot-app:latest
+        image: bharathoptdocker/my_spring_application:latest
         ports:
         - containerPort: 8080
         envFrom:
