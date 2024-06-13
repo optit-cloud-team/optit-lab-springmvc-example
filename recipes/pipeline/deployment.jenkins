@@ -6,8 +6,8 @@ pipeline {
             steps {
                 script {
                     git branch: 'main',
-                        credentialsId: 'git-PAT',
-                        url: 'https://github.com/optit-cloud-team/optit-lab-springmvc-example.git'
+                    credentialsId: 'bharath',
+                    url: 'https://github.com/optit-cloud-team/optit-lab-springmvc-example.git'
                 }
             }
         }
