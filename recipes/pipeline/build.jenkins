@@ -22,7 +22,7 @@ pipeline {
                 script {
                     withCredentials([file(credentialsId: 'poc-kube-cluster-cred-1', variable: 'KUBECONFIG')]) {
                         // Deploy Namespace
-                        sh "kubectl apply -f kubernetes/manifests/namespace.yaml"
+                        sh "kubectl apply -f namespace.yaml"
                         
                         // Deploy MySQL Secret
                         sh "kubectl apply -f mysql-secret.yaml"
@@ -31,10 +31,10 @@ pipeline {
                         sh "kubectl apply -f mysql-storage.yaml"
                         
                         // Deploy MySQL Deployment
-                        sh "kubectl apply -f kubernetes/manifests/mysql-deployment.yaml -n spring-example"
+                        sh "kubectl apply -f mysql-deployment.yaml -n spring-example"
 
                         // Deploy MySQL Service
-                        sh "kubectl apply -f kubernetes/manifests/mysql-service.yaml -n spring-example"
+                        sh "kubectl apply -f mysql-service.yaml -n spring-example"
                     }
                 }
             }
