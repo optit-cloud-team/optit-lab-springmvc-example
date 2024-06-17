@@ -16,7 +16,70 @@ pipeline {
                 }
             }
         }
-        stage('Verify Dockerfile') {
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                script {
+                    git branch: 'main',
+                        credentialsId: 'bharath',
+                        url: 'https://github.com/optit-cloud-team/optit-lab-springmvc-example.git'
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    withCredentials([file(credentialsId: 'poc-kube-cluster-cred-1', variable: 'KUBECONFIG')]) {
+                        // Deploy Namespace
+                        sh "kubectl apply -f kubernetes/manifests/namespace.yaml"
+                        
+                        // Deploy MySQL Secret
+                        sh "kubectl apply -f mysql-secret.yaml"
+
+                        // Deploy MySQL Storage
+                        sh "kubectl apply -f mysql-storage.yaml"
+                        
+                        // Deploy MySQL Deployment
+                        sh "kubectl apply -f kubernetes/manifests/mysql-deployment.yaml -n spring-example"
+
+                        // Deploy MySQL Service
+                        sh "kubectl apply -f kubernetes/manifests/mysql-service.yaml -n spring-example"
+                    }
+                }
+            }
+        }
+
+        stage('Testing') {
+            steps {
+                script {
+                    // List the pods
+                    sh "kubectl get pods -n spring-example"
+                    
+                    // Get a shell for the MySQL pod
+                    sh '''
+                        MYSQL_POD=$(kubectl get pod -n spring-example -l app=mysql -o jsonpath="{.items[0].metadata.name}")
+                        kubectl exec --stdin --tty $MYSQL_POD -n spring-example -- /bin/bash -c "mysql -p"
+                    '''
+                }
+            }
+        }
+    }
+}
+stage('Maven Build') {
+            steps {
+                script {
+// Navigate to the directory, Clean and build the Maven project
+                    sh "cd recipes && mvn clean install"
+                }
+            }
+        }
+
+stage('Verify Dockerfile') {
             steps {
                 script {
                     // Print working directory and list files to verify Dockerfile presence
@@ -24,34 +87,37 @@ pipeline {
                 }
             }
         }
-        stage('Build Docker Images') {
+        
+                stage('Build Docker Images') {
             steps {
                 script {
                     // Navigate to the directory containing Dockerfiles
                     dir('recipes') {
-                        // Build Docker images using Dockerfiles
-                        sh "docker build -f Dockerfilemysql -t bharathoptdocker/mysql:latest ."
+                        // Build Docker images using Dockerfile
                         sh "docker build -f Dockerfile -t bharathoptdocker/my_spring_application:latest ."
-
+                        
                         // List Docker images
                         sh 'docker images'
                     }
                 }
             }
         }
+
         stage('Docker Publish') {
             steps {
                 script {
                     // Docker login using credentials
                     withCredentials([usernamePassword(credentialsId: 'bkdockerid', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                         sh 'echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin'
-                        sh 'docker push bharathoptdocker/mysql:latest'
+                        
+                        // Push Docker image to Docker Hub
                         sh 'docker push bharathoptdocker/my_spring_application:latest'
                     }
                 }
             }
         }
     }
+
     post {
         success {
             echo 'Pipeline executed successfully!'

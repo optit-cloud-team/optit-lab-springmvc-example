@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: mysql
+  name: mysql-secondary  # Example: Changed name to avoid conflict
   namespace: spring-example
 spec:
   ports:
-    - port: 3306
+    - port: 3307  # Example: Changed port to avoid conflict
   selector:
     app: mysql
   clusterIP: None
