@@ -23,7 +23,6 @@ pipeline {
                     withCredentials([file(credentialsId: 'poc-kube-cluster-cred-1', variable: 'KUBECONFIG')]) {
                         sh "pwd && cd recipes/kubernetes/manifests"
                         // Deploy Namespace
-                        sh "kubectl apply -f namespace.yaml"
                         
                         // Deploy MySQL Secret
                         sh "kubectl apply -f mysql-secret.yaml"
