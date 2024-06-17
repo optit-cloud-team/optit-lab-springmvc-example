@@ -21,24 +21,21 @@ pipeline {
             steps {
                 script {
                     withCredentials([file(credentialsId: 'poc-kube-cluster-cred-1', variable: 'KUBECONFIG')]) {
-                        sh "pwd && cd recipes/kubernetes/manifests && pwd && ls"
-                        // Deploy Namespace
-                        
-                        // Deploy MySQL Secret
-                        sh "kubectl apply -f mysql-secret.yaml"
+                        stage('Deploy to Kubernetes') {
+    steps {
+        script {
+            dir('recipes/kubernetes/manifests') {
+                // Deploy MySQL Secret
+                sh "kubectl apply -f mysql-secret.yaml"
 
-                        // Deploy MySQL Storage
-                        sh "kubectl apply -f mysql-storage.yaml"
-                        
-                        // Deploy MySQL Deployment
-                        sh "kubectl apply -f mysql-deployment.yaml -n spring-example"
-
-                        // Deploy MySQL Service
-                        sh "kubectl apply -f mysql-service.yaml -n spring-example"
-                    }
-                }
+                // Deploy other resources as needed
+                sh "kubectl apply -f mysql-storage.yaml"
+                sh "kubectl apply -f mysql-deployment.yaml -n spring-example"
+                sh "kubectl apply -f mysql-service.yaml -n spring-example"
             }
         }
+    }
+}
 
         stage('Testing') {
             steps {
