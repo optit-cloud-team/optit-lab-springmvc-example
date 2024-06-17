@@ -33,27 +33,11 @@ pipeline {
             }
         }
 
-        stage('Testing') {
-            steps {
-                script {
-                    // List the pods
-                    sh "kubectl get pods -n spring-example"
-                    
-                    // Get a shell for the MySQL pod
-                    sh '''
-                        MYSQL_POD=$(kubectl get pod -n spring-example -l app=mysql -o jsonpath="{.items[0].metadata.name}")
-                        kubectl exec --stdin --tty $MYSQL_POD -n spring-example -- /bin/bash -c "mysql -p"
-                    '''
-                }
-            }
-        }
-
-
         stage('Maven Build') {
             steps {
                 script {
                     // Navigate to the directory, Clean and build the Maven project
-                    sh "cd recipes && mvn clean install"
+                    sh "cd .. && cd .. && cd .. cd recipes && mvn clean install"
                 }
             }
         }
