@@ -52,11 +52,7 @@ pipeline {
                         sh "kubectl apply -f recipes/kubernetes/manifests/mysql-deployment.yaml -n ${params.K8S_NAMESPACE}"
                         sh "kubectl apply -f recipes/kubernetes/manifests/mysql-service.yaml -n ${params.K8S_NAMESPACE}"
 
-                        // Wait for MySQL to be ready
-                        sh """
-                        echo "Waiting for MySQL deployment to be ready..."
-                        kubectl rollout status deployment/mysql-deployment -n ${params.K8S_NAMESPACE}
-                        """
+                    
                     }
                 }
             }
