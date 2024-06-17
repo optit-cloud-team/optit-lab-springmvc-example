@@ -21,7 +21,7 @@ pipeline {
             steps {
                 script {
                     withCredentials([file(credentialsId: 'poc-kube-cluster-cred-1', variable: 'KUBECONFIG')]) {
-                        sh "pwd && cd recipes/kubernetes/manifests && pwd"
+                        sh "pwd && cd recipes/kubernetes/manifests && pwd && ls"
                         // Deploy Namespace
                         
                         // Deploy MySQL Secret
