@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: spring-app
-  namespace: spring-example
+  namespace: test
 spec:
   replicas: 1
   selector:
