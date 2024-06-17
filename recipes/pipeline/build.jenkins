@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    parameters {
+        string(name: 'GIT_BRANCH', defaultValue: 'main', description: 'Git branch to build from')
+        string(name: 'K8S_NAMESPACE', defaultValue: 'spring-example', description: 'Kubernetes namespace to use')
+    }
+
     environment {
         MAVEN_HOME = '/opt/apache-maven-3.6.3'
         PATH = "${MAVEN_HOME}/bin:${env.PATH}"
@@ -10,24 +15,48 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-                    git branch: 'main',
+                    git branch: "${params.GIT_BRANCH}",
                         credentialsId: 'bharath',
                         url: 'https://github.com/optit-cloud-team/optit-lab-springmvc-example.git'
                 }
             }
         }
 
-        stage('Deploy the MySQL service in Kubernetes') {
+        stage('Prepare Kubernetes Namespace') {
+            steps {
+                script {
+                    withCredentials([file(credentialsId: 'poc-kube-cluster-cred-1', variable: 'KUBECONFIG')]) {
+                        // Check if the namespace exists, if not create it
+                        sh """
+                        if ! kubectl get namespace ${params.K8S_NAMESPACE}; then
+                            echo "Namespace ${params.K8S_NAMESPACE} not found. Creating it..."
+                            kubectl create namespace ${params.K8S_NAMESPACE}
+                        else
+                            echo "Namespace ${params.K8S_NAMESPACE} already exists."
+                        fi
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Deploy MySQL to Kubernetes') {
             steps {
                 script {
                     withCredentials([file(credentialsId: 'poc-kube-cluster-cred-1', variable: 'KUBECONFIG')]) {
                         // Deploy MySQL Secret
-                        sh "kubectl apply -f recipes/kubernetes/manifests/mysql-secret.yaml"
+                        sh "kubectl apply -f recipes/kubernetes/manifests/mysql-secret.yaml -n ${params.K8S_NAMESPACE}"
 
-                        // Deploy other resources as needed
-                        sh "kubectl apply -f recipes/kubernetes/manifests/mysql-storage.yaml"
-                        sh "kubectl apply -f recipes/kubernetes/manifests/mysql-deployment.yaml -n spring-example"
-                        sh "kubectl apply -f recipes/kubernetes/manifests/mysql-service.yaml -n spring-example"
+                        // Deploy MySQL resources
+                        sh "kubectl apply -f recipes/kubernetes/manifests/mysql-storage.yaml -n ${params.K8S_NAMESPACE}"
+                        sh "kubectl apply -f recipes/kubernetes/manifests/mysql-deployment.yaml -n ${params.K8S_NAMESPACE}"
+                        sh "kubectl apply -f recipes/kubernetes/manifests/mysql-service.yaml -n ${params.K8S_NAMESPACE}"
+
+                        // Wait for MySQL to be ready
+                        sh """
+                        echo "Waiting for MySQL deployment to be ready..."
+                        kubectl rollout status deployment/mysql-deployment -n ${params.K8S_NAMESPACE}
+                        """
                     }
                 }
             }
@@ -36,7 +65,7 @@ pipeline {
         stage('Maven Build') {
             steps {
                 script {
-                    // Navigate to the directory, Clean and build the Maven project
+                    // Navigate to the directory, clean and build the Maven project
                     sh "pwd && cd recipes && mvn clean install"
                 }
             }
@@ -50,7 +79,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Build Docker Images') {
             steps {
                 script {
@@ -58,7 +87,7 @@ pipeline {
                     dir('recipes') {
                         // Build Docker images using Dockerfile
                         sh "docker build -f Dockerfile -t bharathoptdocker/my_spring_application:latest ."
-                        
+
                         // List Docker images
                         sh 'docker images'
                     }
@@ -72,7 +101,7 @@ pipeline {
                     // Docker login using credentials
                     withCredentials([usernamePassword(credentialsId: 'bkdockerid', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                         sh 'echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin'
-                        
+
                         // Push Docker image to Docker Hub
                         sh 'docker push bharathoptdocker/my_spring_application:latest'
                     }
