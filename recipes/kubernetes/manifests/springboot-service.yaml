@@ -1,11 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: mysql-secondary  # Example: Changed name to avoid conflict
+  name: mysql-secondary
   namespace: spring-example
 spec:
+  type: NodePort  # Changed to NodePort to expose outside the cluster
   ports:
-    - port: 3307  # Example: Changed port to avoid conflict
+    - port: 3307
+      targetPort: 3307
+      nodePort: 32007  # Optional: specify a port in the range 30000-32767
   selector:
     app: mysql
-  clusterIP: None
