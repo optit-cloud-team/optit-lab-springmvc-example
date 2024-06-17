@@ -17,20 +17,6 @@ pipeline {
             }
         }
 
-pipeline {
-    agent any
-
-    stages {
-        stage('Checkout') {
-            steps {
-                script {
-                    git branch: 'main',
-                        credentialsId: 'bharath',
-                        url: 'https://github.com/optit-cloud-team/optit-lab-springmvc-example.git'
-                }
-            }
-        }
-
         stage('Deploy to Kubernetes') {
             steps {
                 script {
@@ -68,18 +54,17 @@ pipeline {
                 }
             }
         }
-    }
-}
-stage('Maven Build') {
+
+        stage('Maven Build') {
             steps {
                 script {
-// Navigate to the directory, Clean and build the Maven project
+                    // Navigate to the directory, Clean and build the Maven project
                     sh "cd recipes && mvn clean install"
                 }
             }
         }
 
-stage('Verify Dockerfile') {
+        stage('Verify Dockerfile') {
             steps {
                 script {
                     // Print working directory and list files to verify Dockerfile presence
@@ -88,7 +73,7 @@ stage('Verify Dockerfile') {
             }
         }
         
-                stage('Build Docker Images') {
+        stage('Build Docker Images') {
             steps {
                 script {
                     // Navigate to the directory containing Dockerfiles
