@@ -37,7 +37,7 @@ pipeline {
             steps {
                 script {
                     // Navigate to the directory, Clean and build the Maven project
-                    sh "pwd && ls && cd .. && cd .. && cd .. cd recipes && mvn clean install"
+                    sh "pwd && cd recipes && mvn clean install"
                 }
             }
         }
