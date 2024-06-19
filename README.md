@@ -147,10 +147,14 @@ As a DevOps engineer, here are key practices to incorporate into the Recipe Mana
 
 By incorporating these DevOps practices, you can enhance the development, deployment, and operations of the Recipe Management System, ensuring reliability, scalability, and security.
 
-# mysql
+# mysql [2ways]
 To set up MySQL and configure it for your Recipe Management System, follow these comprehensive steps:
+###pull image and create single instance mysql file
+look for documentation
 
-### MySQL Installation and Configuration
+
+
+### MySQL Installation and Configuration [local einstall and configure]
 
 1. **Install MySQL**: Start by installing MySQL on your system. You can download MySQL Community Server from the official website or use a package manager like Homebrew on macOS or apt on Ubuntu.
 
