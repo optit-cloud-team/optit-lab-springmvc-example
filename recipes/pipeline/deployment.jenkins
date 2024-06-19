@@ -18,8 +18,8 @@ pipeline {
                     withCredentials([file(credentialsId: 'poc-kube-cluster-cred-1', variable: 'KUBECONFIG')]) {
 
                         // Deploy Spring Boot
-                        sh "kubectl apply -f recipes/kubernetes/manifests/springboot-deployment.yaml"
-                        sh "kubectl apply -f recipes/kubernetes/manifests/springboot-service.yaml"
+                        sh "kubectl apply -f recipes/kubernetes/manifests/springboot-deployment.yaml -n spring-example"
+                        sh "kubectl apply -f recipes/kubernetes/manifests/springboot-service.yaml -n spring-example"
                     }
                 }
             }
