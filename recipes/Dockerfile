@@ -8,7 +8,7 @@ WORKDIR /app
 COPY target/recipes-0.0.1-SNAPSHOT.war /app/app.war
 
 # Expose the port the application will run on
-EXPOSE 7071
+EXPOSE 8080
 
 # Command to run the application
 CMD ["java", "-jar", "app.war"]

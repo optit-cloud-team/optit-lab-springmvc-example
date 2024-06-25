@@ -6,8 +6,8 @@ metadata:
 spec:
   type: NodePort  # Changed to NodePort to expose outside the cluster
   ports:
-    - port: 3307
-      targetPort: 3307
-      nodePort: 32007  # Optional: specify a port in the range 30000-32767
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30080  # Optional: specify a port in the range 30000-32767
   selector:
     app: spring-app
