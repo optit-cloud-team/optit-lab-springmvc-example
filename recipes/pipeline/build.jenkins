@@ -25,7 +25,8 @@ pipeline {
                         sh "kubectl apply -f recipes/kubernetes/manifests/mysql-secret.yaml"
 
                         // Deploy other resources as needed
-                        sh "kubectl apply -f recipes/kubernetes/manifests/mysql-storage.yaml"
+                        sh "kubectl apply -f recipes/kubernetes/manifests/mysql-storage/mysql-pv.yaml"
+                        sh "kubectl apply -f recipes/kubernetes/manifests/mysql-storage/mysql-pvc.yaml"
                         sh "kubectl apply -f recipes/kubernetes/manifests/mysql-deployment.yaml -n spring-example"
                         sh "kubectl apply -f recipes/kubernetes/manifests/mysql-service.yaml -n spring-example"
                     }
