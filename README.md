@@ -130,147 +130,141 @@ The Recipe Management System is a web application designed to streamline the pro
 - **Jenkins Pipelines**: Jenkins pipelines automate the build, test, and deployment processes, ensuring efficiency and consistency in the development lifecycle.
 
 ---
+README that includes the steps and resources for setting up MySQL and integrating it with your Recipe Management System. I’ve also included a section for adding your existing files as points:
+---
 
-## Deploying MySQL and Microservices
+## 1st Way to Deploy: Setting Up MySQL for Recipe Management System
 
-### 1. Deploying MySQL on Kubernetes
+This guide outlines the steps to set up MySQL, configure it for your Recipe Management System, and integrate it with a Spring Boot application using Kubernetes. Follow these steps to get everything up and running.
 
-To set up MySQL and configure it for your Recipe Management System, follow these steps:
+### Step 1: Pull MySQL Image and Create a Single Instance MySQL Deployment
 
-#### a. Pull the MySQL Image and Create a Single Instance MySQL Deployment
+1. **Pull the MySQL Docker Image**  
+   Use the official MySQL Docker image to create a MySQL instance. Follow these [documentation steps](https://medium.com/@midejoseph24/deploying-mysql-on-kubernetes-16758a42a746) for pulling the image and creating the deployment.
 
-Refer to the following documentation for a detailed guide on deploying MySQL on Kubernetes:
+2. **Create MySQL Kubernetes Resources**  
+   Follow these [Kubernetes guidelines](https://kubernetes.io/docs/tasks/run-application/run-single-instance-stateful-application/) for setting up a single instance MySQL deployment.
 
-- [Deploying MySQL on Kubernetes](https://medium.com/@midejoseph24/deploying-mysql-on-kubernetes-16758a42a746)
-- [Kubernetes Single Instance Stateful Application](https://kubernetes.io/docs/tasks/run-application/run-single-instance-stateful-application/)
+   - **mysql-deployment.yaml**  
+     Defines the MySQL deployment.
+   - **mysql-service.yaml**  
+     Configures the MySQL service with NodePort.
 
-##### Key Steps:
-1. **Pull the MySQL Docker Image:**
-
-   ```bash
-   docker pull mysql:latest
-   ```
-
-2. **Create a MySQL Deployment YAML File:**
-
-   Create a `mysql-deployment.yaml` file with the necessary configuration for your MySQL instance.
-
-   Example YAML file:
-
-   ```yaml
-   apiVersion: apps/v1
-   kind: Deployment
-   metadata:
-     name: mysql-deployment
-   spec:
-     replicas: 1
-     selector:
-       matchLabels:
-         app: mysql
-     template:
-       metadata:
-         labels:
-           app: mysql
-       spec:
-         containers:
-         - name: mysql
-           image: mysql:latest
-           env:
-           - name: MYSQL_ROOT_PASSWORD
-             value: your-root-password
-           - name: MYSQL_DATABASE
-             value: your-database-name
-           - name: MYSQL_USER
-             value: your-username
-           - name: MYSQL_PASSWORD
-             value: your-password
-           ports:
-           - containerPort: 3306
-   ```
-
-3. **Apply the MySQL Deployment:**
+   Place these files in the `optit-lab-springmvc-example/recipes/kubernetes/manifests/` directory:
+   - `mysql-deployment.yaml`
+   - `mysql-service.yaml`
+   - `mysql-secret.yaml` (for storing MySQL credentials)
+   - `mysql-storage.yaml` (for configuring persistent storage)
+   - `mysql-pv.yaml` (for the Persistent Volume)
+   - `mysql-pvc.yaml` (for the Persistent Volume Claim)
 
    ```bash
+   kubectl apply -f mysql-pv.yaml
+   kubectl apply -f mysql-pvc.yaml
    kubectl apply -f mysql-deployment.yaml
+   kubectl apply -f mysql-service.yaml
+   kubectl apply -f mysql-secret.yaml
    ```
 
-4. **Verify the Deployment:**
-
-   Ensure that all microservices, including MySQL, are in the running state:
+3. **Verify Microservices**  
+   Ensure that all microservices are in the running state after applying the configurations:
 
    ```bash
    kubectl get pods
    ```
 
-#### b. Configure the Application
+### Step 2: Configure the Spring Boot Application
 
-1. **Update `application.properties` File:**
-
-   Edit the `application.properties` file to configure the connection to your MySQL database. Set the connection URL, username, and password as needed.
-
-   Example configuration:
+1. **Update Application Properties**  
+   Edit the `application.properties` file to configure the database connection settings:
 
    ```properties
-   spring.datasource.url=jdbc:mysql://mysql-service:3306/your-database-name
-   spring.datasource.username=your-username
-   spring.datasource.password=your-password
+   spring.datasource.url=jdbc:mysql://<mysql-service-ip>:<mysql-service-port>/recipe_management
+   spring.datasource.username=<your-username>
+   spring.datasource.password=<your-password>
    ```
 
-2. **Build and Test the Application:**
+2. **Build the Spring Boot Application**  
+   Use Maven to clean and install the application:
 
-   - **Clean and Build the Project:**
+   ```bash
+   mvn clean install -X
+   ```
 
-     ```bash
-     mvn clean install -X
-     ```
+   Ensure the build is successful. 
 
-   - **Verify Build Success:**
+### Step 3: Create Dockerfile and Build Docker Image
 
-     Ensure that the build is successful before proceeding. If the build succeeds, you can continue to the next steps.
+1. **Create a Dockerfile**  
+   Use the Maven snapshot file to create a Dockerfile for your application:
 
-#### c. Create a Dockerfile and Build the Docker Image
-
-1. **Create a Dockerfile:**
-
-   Create a `Dockerfile` in your project directory using the Maven-generated snapshot JAR file.
-
-   Example Dockerfile:
-
-   ```Dockerfile
+   ```dockerfile
    FROM openjdk:11-jre-slim
-   COPY target/your-application-snapshot.jar /app.jar
-   ENTRYPOINT ["java", "-jar", "/app.jar"]
+   COPY target/your-application-snapshot.jar /app/your-application.jar
+   ENTRYPOINT ["java", "-jar", "/app/your-application.jar"]
    ```
 
-2. **Build the Docker Image:**
+2. **Build the Docker Image**
 
    ```bash
-   docker build -t your-image-name:latest .
+   docker build -t your-application-image:latest .
    ```
 
-3. **Push the Docker Image to a Registry:**
+### Step 4: Update Kubernetes Manifests for Spring Boot Application
 
-   Push the Docker image to your Docker registry (e.g., Docker Hub or a private registry).
+1. **Add the Docker Image to Kubernetes Manifests**  
+   Update `springboot-deployment.yaml` with the newly created Docker image.
+
+2. **Apply Kubernetes Configurations**  
 
    ```bash
-   docker push your-image-name:latest
+   kubectl apply -f springboot-deployment.yaml
+   kubectl apply -f springboot-service.yaml
+   kubectl apply -f ingress.yaml
    ```
 
-#### d. Update Kubernetes Manifests
+### Step 5: Create a CI/CD Pipeline for Automation
 
-Update the Kubernetes manifest files to use the Docker image you built. Modify the `deployment.yaml` files for your microservices to reference the new image.
+1. **Set Up a CI/CD Pipeline**  
+   Create a pipeline to automate the build and deployment processes. This includes automating Docker builds and Kubernetes deployments.
 
-Example:
+   Consider using tools like Jenkins, GitLab CI/CD, or GitHub Actions for this step.
 
-```yaml
-image: your-image-name:latest
-```
+### File Directory Structure
 
-Finally, apply the updated manifest files to your Kubernetes cluster:
+Your Kubernetes manifest files and their purpose:
 
-```bash
-kubectl apply -f deployment.yaml
-```
+- **`mysql-storage.yaml`**  
+  - Configuration for MySQL persistent storage.
+
+- **`mysql-deployment.yaml`**  
+  - Defines the MySQL deployment.
+
+- **`mysql-secret.yaml`**  
+  - Contains MySQL credentials.
+
+- **`mysql-service.yaml`**  
+  - Configures the MySQL service.
+
+- **`mysql-pv.yaml`**  
+  - Defines the Persistent Volume for MySQL.
+
+- **`mysql-pvc.yaml`**  
+  - Defines the Persistent Volume Claim for MySQL.
+
+- **`springboot-deployment.yaml`**  
+  - Deployment configuration for the Spring Boot application.
+
+- **`springboot-service.yaml`**  
+  - Service configuration for the Spring Boot application.
+
+- **`ingress.yaml`**  
+  - Configures ingress rules for external access to the application.
+
+### Resources
+
+- [Deploying MySQL on Kubernetes](https://medium.com/@midejoseph24/deploying-mysql-on-kubernetes-16758a42a746)
+- [Kubernetes Single Instance Stateful Application](https://kubernetes.io/docs/tasks/run-application/run-single-instance-stateful-application/)
 
 ### Summary
 
