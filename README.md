@@ -129,23 +129,157 @@ The Recipe Management System is a web application designed to streamline the pro
 - **Kubernetes Deployment**: Kubernetes manifests facilitate the deployment and management of the application in a Kubernetes cluster.
 - **Jenkins Pipelines**: Jenkins pipelines automate the build, test, and deployment processes, ensuring efficiency and consistency in the development lifecycle.
 
-# 1st way to deploy.
-adding soon... 
-# mysql
-To set up MySQL and configure it for your Recipe Management System, follow these comprehensive steps:
-###pull image and create single instance mysql file
-look for documentation
+---
 
+## Deploying MySQL and Microservices
 
+### 1. Deploying MySQL on Kubernetes
 
+To set up MySQL and configure it for your Recipe Management System, follow these steps:
 
+#### a. Pull the MySQL Image and Create a Single Instance MySQL Deployment
 
+Refer to the following documentation for a detailed guide on deploying MySQL on Kubernetes:
 
+- [Deploying MySQL on Kubernetes](https://medium.com/@midejoseph24/deploying-mysql-on-kubernetes-16758a42a746)
+- [Kubernetes Single Instance Stateful Application](https://kubernetes.io/docs/tasks/run-application/run-single-instance-stateful-application/)
 
+##### Key Steps:
+1. **Pull the MySQL Docker Image:**
 
+   ```bash
+   docker pull mysql:latest
+   ```
 
+2. **Create a MySQL Deployment YAML File:**
 
+   Create a `mysql-deployment.yaml` file with the necessary configuration for your MySQL instance.
 
+   Example YAML file:
+
+   ```yaml
+   apiVersion: apps/v1
+   kind: Deployment
+   metadata:
+     name: mysql-deployment
+   spec:
+     replicas: 1
+     selector:
+       matchLabels:
+         app: mysql
+     template:
+       metadata:
+         labels:
+           app: mysql
+       spec:
+         containers:
+         - name: mysql
+           image: mysql:latest
+           env:
+           - name: MYSQL_ROOT_PASSWORD
+             value: your-root-password
+           - name: MYSQL_DATABASE
+             value: your-database-name
+           - name: MYSQL_USER
+             value: your-username
+           - name: MYSQL_PASSWORD
+             value: your-password
+           ports:
+           - containerPort: 3306
+   ```
+
+3. **Apply the MySQL Deployment:**
+
+   ```bash
+   kubectl apply -f mysql-deployment.yaml
+   ```
+
+4. **Verify the Deployment:**
+
+   Ensure that all microservices, including MySQL, are in the running state:
+
+   ```bash
+   kubectl get pods
+   ```
+
+#### b. Configure the Application
+
+1. **Update `application.properties` File:**
+
+   Edit the `application.properties` file to configure the connection to your MySQL database. Set the connection URL, username, and password as needed.
+
+   Example configuration:
+
+   ```properties
+   spring.datasource.url=jdbc:mysql://mysql-service:3306/your-database-name
+   spring.datasource.username=your-username
+   spring.datasource.password=your-password
+   ```
+
+2. **Build and Test the Application:**
+
+   - **Clean and Build the Project:**
+
+     ```bash
+     mvn clean install -X
+     ```
+
+   - **Verify Build Success:**
+
+     Ensure that the build is successful before proceeding. If the build succeeds, you can continue to the next steps.
+
+#### c. Create a Dockerfile and Build the Docker Image
+
+1. **Create a Dockerfile:**
+
+   Create a `Dockerfile` in your project directory using the Maven-generated snapshot JAR file.
+
+   Example Dockerfile:
+
+   ```Dockerfile
+   FROM openjdk:11-jre-slim
+   COPY target/your-application-snapshot.jar /app.jar
+   ENTRYPOINT ["java", "-jar", "/app.jar"]
+   ```
+
+2. **Build the Docker Image:**
+
+   ```bash
+   docker build -t your-image-name:latest .
+   ```
+
+3. **Push the Docker Image to a Registry:**
+
+   Push the Docker image to your Docker registry (e.g., Docker Hub or a private registry).
+
+   ```bash
+   docker push your-image-name:latest
+   ```
+
+#### d. Update Kubernetes Manifests
+
+Update the Kubernetes manifest files to use the Docker image you built. Modify the `deployment.yaml` files for your microservices to reference the new image.
+
+Example:
+
+```yaml
+image: your-image-name:latest
+```
+
+Finally, apply the updated manifest files to your Kubernetes cluster:
+
+```bash
+kubectl apply -f deployment.yaml
+```
+
+### Summary
+
+1. Deploy MySQL using the provided documentation.
+2. Configure your `application.properties` file for MySQL.
+3. Build the application and create a Docker image.
+4. Update Kubernetes manifests and deploy the microservices.
+
+By following these steps, you will have a fully deployed MySQL instance and microservices running on Kubernetes.
 
 # 2nd way to deploy[download and install mysql in local machine]
 ## DevOps Engineering Practices
