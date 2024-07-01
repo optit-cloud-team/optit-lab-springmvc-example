@@ -129,6 +129,19 @@ The Recipe Management System is a web application designed to streamline the pro
 - **Kubernetes Deployment**: Kubernetes manifests facilitate the deployment and management of the application in a Kubernetes cluster.
 - **Jenkins Pipelines**: Jenkins pipelines automate the build, test, and deployment processes, ensuring efficiency and consistency in the development lifecycle.
 
+###1st way to deploy.
+adding soon... 
+
+
+
+
+
+
+
+
+
+
+###2nd way to deploy[download and install mysql in local mchine]
 ## DevOps Engineering Practices
 
 As a DevOps engineer, here are key practices to incorporate into the Recipe Management System:
