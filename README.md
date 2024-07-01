@@ -129,8 +129,12 @@ The Recipe Management System is a web application designed to streamline the pro
 - **Kubernetes Deployment**: Kubernetes manifests facilitate the deployment and management of the application in a Kubernetes cluster.
 - **Jenkins Pipelines**: Jenkins pipelines automate the build, test, and deployment processes, ensuring efficiency and consistency in the development lifecycle.
 
-###1st way to deploy.
+# 1st way to deploy.
 adding soon... 
+# mysql
+To set up MySQL and configure it for your Recipe Management System, follow these comprehensive steps:
+###pull image and create single instance mysql file
+look for documentation
 
 
 
@@ -141,7 +145,9 @@ adding soon...
 
 
 
-###2nd way to deploy[download and install mysql in local mchine]
+
+
+# 2nd way to deploy[download and install mysql in local machine]
 ## DevOps Engineering Practices
 
 As a DevOps engineer, here are key practices to incorporate into the Recipe Management System:
@@ -159,12 +165,6 @@ As a DevOps engineer, here are key practices to incorporate into the Recipe Mana
 6. **Security Best Practices**: Apply security best practices, such as securing database connections, implementing access controls, and scanning container images for vulnerabilities, to protect the application and its data.
 
 By incorporating these DevOps practices, you can enhance the development, deployment, and operations of the Recipe Management System, ensuring reliability, scalability, and security.
-
-# mysql [2ways]
-To set up MySQL and configure it for your Recipe Management System, follow these comprehensive steps:
-###pull image and create single instance mysql file
-look for documentation
-
 
 
 ### MySQL Installation and Configuration [local einstall and configure]
