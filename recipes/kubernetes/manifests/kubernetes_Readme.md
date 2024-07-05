@@ -1,67 +1,113 @@
- This section describes how to deploy your application using Kubernetes manifests and provides detailed explanations for each file.
-
 ---
+# Spring Boot and MySQL Kubernetes Deployment
 
-## Kubernetes Deployment for Recipe Management System
+This repository contains Kubernetes manifests for deploying a Spring Boot application and MySQL database. It includes configurations for persistent storage, deployments, and services, as well as instructions for creating secrets and applying the manifests.
 
-This section describes the Kubernetes manifests and configurations used to deploy the Recipe Management System on a Kubernetes cluster. The setup includes the creation of a namespace, the deployment of MySQL, and the deployment of the producer and consumer services.
+## Table of Contents
 
-### Table of Contents
+- [Prerequisites](#prerequisites)
+- [Directory Structure](#directory-structure)
+- [Components](#components)
+  - [Namespace](#namespace)
+  - [MySQL Storage](#mysql-storage)
+  - [MySQL Deployment and Service](#mysql-deployment-and-service)
+  - [Spring Boot Deployment and Service](#spring-boot-deployment-and-service)
+  - [Creating Secrets](#creating-secrets)
+- [Deployment Steps](#deployment-steps)
+- [Verification](#verification)
+- [Troubleshooting](#troubleshooting)
+- [License](#license)
 
-1. [Namespaces](#namespaces)
-2. [MySQL](#mysql)
-3. [Producer](#producer)
-4. [Consumer Services](#consumer-services)
-5. [How to Apply the Manifests](#how-to-apply-the-manifests)
-6. [Example Commands](#example-commands)
+## Prerequisites
 
----
+- A Kubernetes cluster up and running.
+- `kubectl` command-line tool installed and configured to interact with your cluster.
+- Docker image for your Spring Boot application is available and accessible (replace `bharathoptdocker/my_spring_application:version1` with your Docker image name and tag).
 
-### Namespaces
+## Directory Structure
 
-**`my-namespace.yaml`**
+```plaintext
+kubernetes/
+├── manifests/
+│   ├── namespace.yaml
+│   ├── mysql-pv.yaml
+│   ├── mysql-pvc.yaml
+│   ├── mysql-deployment.yaml
+│   ├── mysql-service.yaml
+│   ├── springboot-deployment.yaml
+│   ├── springboot-service.yaml
+```
+
+## Components
+
+### Namespace
+
+**`namespace.yaml`**
+
+Defines the `spring-example` namespace for isolating resources.
 
 ```yaml
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: my-namespace
+  name: spring-example
 ```
 
-This manifest creates a namespace named `my-namespace` for organizing the Kubernetes resources.
+### MySQL Storage
 
-### MySQL
+**`mysql-pv.yaml`**
 
-**`mysql-storage.yaml`**
+Defines the Persistent Volume for MySQL storage.
+
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data/mysql"
+```
 
 **`mysql-pvc.yaml`**
+
+Defines the Persistent Volume Claim for MySQL storage.
 
 ```yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mysql-pvc
-  namespace: my-namespace
+  name: mysql-pv-claim
+  namespace: spring-example
 spec:
+  storageClassName: manual
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 1Gi  # Adjust size as per your requirements
+      storage: 1Gi
 ```
 
-This manifest creates a PersistentVolumeClaim (PVC) for MySQL, which requests 1Gi of storage.
+### MySQL Deployment and Service
 
 **`mysql-deployment.yaml`**
+
+Deploys the MySQL container and sets environment variables.
 
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mysql
-  namespace: my-namespace
+  namespace: spring-example
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: mysql
@@ -73,358 +119,209 @@ spec:
         app: mysql
     spec:
       containers:
-      - name: mysql
-        image: mysql:5.7
+      - image: mysql:5.7
+        name: mysql
         env:
         - name: MYSQL_ROOT_PASSWORD
-          value: "pesuims"
+          value: "Prajna@2003"
         ports:
-        - containerPort: 3309
+        - containerPort: 3306
           name: mysql
         volumeMounts:
         - name: mysql-persistent-storage
           mountPath: /var/lib/mysql
+        command:
+        - /bin/bash
+        - -c
+        - |
+          tail -f /dev/null
       volumes:
       - name: mysql-persistent-storage
         persistentVolumeClaim:
-          claimName: mysql-pvc
+          claimName: mysql-pv-claim
 ```
-
-This manifest deploys a MySQL container with a root password set to `pesuims` and mounts the PVC for persistent storage.
-
-**`mysql-secret.yaml`**
-
-```yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: mysql-secret
-  namespace: my-namespace
-type: Opaque
-data:
-  MYSQL_ROOT_PASSWORD: cGVzdWltcw==  # Base64 encoded 'pesuims'
-```
-
-This manifest creates a secret for storing the MySQL root password.
 
 **`mysql-service.yaml`**
 
+Exposes MySQL on NodePort for external access.
+
 ```yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: mysql-service
-  namespace: my-namespace
+  name: mysql
+  namespace: spring-example
 spec:
+  type: NodePort
+  ports:
+    - port: 3306
+      targetPort: 3306
+      nodePort: 30006  # Choose a port within the range 30000-32767
   selector:
     app: mysql
-  ports:
-    - protocol: TCP
-      port: 3306
-      targetPort: 3306
-  type: ClusterIP
 ```
 
-This manifest exposes the MySQL service on port `3306` within the cluster.
+### Spring Boot Deployment and Service
 
-### Producer
+**`springboot-deployment.yaml`**
 
-**`producer-deployment.yaml`**
+Deploys the Spring Boot application and configures the database connection.
 
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: producer-deployment
-  namespace: my-namespace
+  name: spring-app
+  namespace: spring-example
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: producer
+      app: spring-app
   template:
     metadata:
       labels:
-        app: producer
+        app: spring-app
     spec:
       containers:
-        - name: producer
-          image: bharathoptdocker/python-producer:1
-          ports:
-            - containerPort: 5000
+      - name: spring-app
+        image: bharathoptdocker/my_spring_application:version1  # Replace with your Docker image name and tag
+        ports:
+        - containerPort: 7071  # Ensure this matches the port your Spring Boot application is listening on
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:mysql://mysql:3306/recipes"
+        - name: SPRING_DATASOURCE_USERNAME
+          value: "root"
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: mysql-root-password
 ```
 
-This manifest deploys the producer service, which is responsible for sending messages to RabbitMQ and providing API endpoints.
+**`springboot-service.yaml`**
 
-**`producer-service.yaml`**
+Exposes the Spring Boot application on NodePort for external access.
 
 ```yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: producer-service
-  namespace: my-namespace
+  name: spring-app-service
+  namespace: spring-example
 spec:
-  selector:
-    app: producer
+  type: NodePort  # Changed to NodePort to expose outside the cluster
   ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 5000
-  type: ClusterIP
-```
-
-This manifest exposes the producer service on port `80` within the cluster.
-
-### Consumer Services
-
-Each consumer service has a similar deployment and service configuration:
-
-#### **Consumer One**
-
-**`consumer-one-deployment.yaml`**
-
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: consumer-one-deployment
-  namespace: my-namespace
-spec:
-  replicas: 1
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30080  # Optional: specify a port in the range 30000-32767
   selector:
-    matchLabels:
-      app: consumer-one
-  template:
-    metadata:
-      labels:
-        app: consumer-one
-    spec:
-      containers:
-        - name: consumer-one
-          image: bharathoptdocker/python-consumer-one
-          ports:
-            - containerPort: 5000
+    app: spring-app
 ```
 
-**`consumer-one-service.yaml`**
+### Creating Secrets
 
-```yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: consumer-one-service
-  namespace: my-namespace
-spec:
-  selector:
-    app: consumer-one
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 5000
-  type: ClusterIP
+Create the `mysql-secret` using the following command:
+
+```bash
+kubectl create secret generic mysql-secret \
+  --from-literal=mysql-root-password=Prajna@2003 \
+  --namespace=spring-example
 ```
 
-#### **Consumer Two**
-
-**`consumer-two-deployment.yaml`**
-
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: consumer-two-deployment
-  namespace: my-namespace
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: consumer-two
-  template:
-    metadata:
-      labels:
-        app: consumer-two
-    spec:
-      containers:
-        - name: consumer-two
-          image: bharathoptdocker/python-consumer-two:1
-          ports:
-            - containerPort: 5000
-```
-
-**`consumer-two-service.yaml`**
-
-```yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: consumer-two-service
-  namespace: my-namespace
-spec:
-  selector:
-    app: consumer-two
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 5000
-  type: ClusterIP
-```
-
-#### **Consumer Three**
-
-**`consumer-three-deployment.yaml`**
-
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: consumer-three-deployment
-  namespace: my-namespace
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: consumer-three
-  template:
-    metadata:
-      labels:
-        app: consumer-three
-    spec:
-      containers:
-        - name: consumer-three
-          image: bharathoptdocker/python-consumer-three:1
-          ports:
-            - containerPort: 5000
-```
-
-**`consumer-three-service.yaml`**
-
-```yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: consumer-three-service
-  namespace: my-namespace
-spec:
-  selector:
-    app: consumer-three
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 5000
-  type: ClusterIP
-```
-
-#### **Consumer Four**
-
-**`consumer-four-deployment.yaml`**
-
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: consumer-four-deployment
-  namespace: my-namespace
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: consumer-four
-  template:
-    metadata:
-      labels:
-        app: consumer-four
-    spec:
-      containers:
-        - name: consumer-four
-          image: bharathoptdocker/python-consumer-four:1
-          ports:
-            - containerPort: 5000
-```
-
-**`consumer-four-service.yaml`**
-
-```yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: consumer-four-service
-  namespace: my-namespace
-spec:
-  selector:
-    app: consumer-four
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 5000
-  type: ClusterIP
-```
-
-### How to Apply the Manifests
-
-To deploy the application, follow these steps:
+### Deployment Steps
 
 1. **Apply the Namespace:**
 
-    ```bash
-    kubectl apply -f kubernetes/manifest/my-namespace.yaml
-    ```
+   ```bash
+   kubectl apply -f kubernetes/manifests/namespace.yaml
+   ```
 
-2. **Deploy MySQL:**
+2. **Deploy MySQL Persistent Storage:**
 
-    ```bash
-    kubectl apply -f kubernetes/manifest/mysql-storage.yaml
-    kubectl apply -f kubernetes/manifest/mysql-secret.yaml
-    kubectl apply -f kubernetes/manifest/mysql-deployment.yaml
-    kubectl apply -f kubernetes/manifest/mysql-service.yaml
-    ```
+   ```bash
+   kubectl apply -f kubernetes/manifests/mysql-pv.yaml
+   kubectl apply -f kubernetes/manifests/mysql-pvc.yaml
+   ```
 
-3. **Deploy Producer:**
+3. **Deploy MySQL:**
 
-    ```bash
-    kubectl apply -f kubernetes/manifest/producer/producer-deployment.yaml
-    kubectl apply -f kubernetes/manifest/producer/producer-service.yaml
-    ```
+   ```bash
+   kubectl apply -f kubernetes/manifests/mysql-deployment.yaml
+   kubectl apply -f kubernetes/manifests/mysql-service.yaml
+   ```
 
-4. **Deploy Consumer Services:**
+4. **Deploy Spring Boot Application:**
 
-    ```bash
-    kubectl apply -f kubernetes/manifest/consumer_one/deployment.yaml
-    kubectl apply -f kubernetes/manifest/consumer_one/service.yaml
+   ```bash
+   kubectl apply -f kubernetes/manifests/springboot-deployment.yaml
+   kubectl apply -f kubernetes/manifests/springboot-service.yaml
+   ```
 
-    kubectl apply -f kubernetes/manifest/consumer_two/deployment.yaml
-    kubectl apply -f kubernetes/manifest/consumer_two/service.yaml
+5. **Create the MySQL Secret:**
 
-    kubectl apply -f kubernetes/manifest/consumer_three/deployment.yaml
-    kubectl apply -f kubernetes/manifest/consumer_three/service.yaml
+   ```bash
+   kubectl create secret generic mysql-secret \
+     --from-literal=mysql-root-password=Prajna@2003 \
+     --namespace=spring-example
+   ```
 
-    kub
+### Verification
 
-ectl apply -f kubernetes/manifest/consumer_four/deployment.yaml
-    kubectl apply -f kubernetes/manifest/consumer_four/service.yaml
-    ```
+To verify that the deployment is successful, you can check the status of the resources:
 
-### Example Commands
+- **Check Pods:**
 
-Here are some example commands you might use during deployment:
+  ```bash
+  kubectl get pods -n spring-example
+  ```
 
-```bash
-# Check the status of the namespace
-kubectl get namespaces
+- **Check Services:**
 
-# Check the status of MySQL Pods
-kubectl get pods -n my-namespace -l app=mysql
+  ```bash
+  kubectl get services -n spring-example
+  ```
 
-# Check the status of the Producer Pods
-kubectl get pods -n my-namespace -l app=producer
+- **Check Deployments:**
 
-# Check the status of Consumer One Pods
-kubectl get pods -n my-namespace -l app=consumer-one
+  ```bash
+  kubectl get deployments -n spring-example
+  ```
 
-# Check the status of all services in the namespace
-kubectl get services -n my-namespace
-```
+- **Check Logs for Spring Boot Application:**
 
----
+  ```bash
+  kubectl logs -f deployment/spring-app -n spring-example
+  ```
 
-This section provides the necessary Kubernetes manifests for deploying the Recipe Management System and instructions on how to apply these manifests to set up the environment.
+- **Check Logs for MySQL:**
+
+  ```bash
+  kubectl logs -f deployment/mysql -n spring-example
+  ```
+
+### Troubleshooting
+
+- **If the Spring Boot application cannot connect to MySQL:**
+
+  Ensure that `SPRING_DATASOURCE_URL` is correctly set and that the MySQL service is reachable.
+
+- **If there are issues with persistent storage:**
+
+  Check the Persistent Volume and Persistent Volume Claim statuses:
+
+  ```bash
+  kubectl get pv
+  kubectl get pvc -n spring-example
+  ```
+
+- **If pods are not running:**
+
+  Check the events and describe the pods for more details:
+
+  ```bash
+  kubectl describe pod <pod-name> -n spring-example
+  kubectl get events -n spring-example
+  ```
+Adjust the details as needed based on your specific setup and requirements.
