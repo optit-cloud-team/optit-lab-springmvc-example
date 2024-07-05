@@ -517,4 +517,4 @@ recipes/
 
 The *Recipe Management System* is a comprehensive solution for managing recipes with a robust backend and intuitive user interface. This guide has walked you through the setup of the application, deployment strategies using Kubernetes and local MySQL, and best practices for DevOps engineering. Following these steps will ensure that your application is properly configured, deployed, and maintained.
 
-# Addition improvement/changes update will be added below.
+# Additional improvement/changes update will be added below.
