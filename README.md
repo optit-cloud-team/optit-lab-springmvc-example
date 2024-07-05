@@ -1,75 +1,3 @@
-
-```
-recipes/
-├── mvnw
-│   ├── mvnw.cmd
-│   ├── pom.xml
-│
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── edu/
-│   │   │       └── pes/
-│   │   │           └── recipes/
-│   │   │               ├── controller/
-│   │   │               │   ├── HomeController.java
-│   │   │               │   └── RecipeController.java
-│   │   │               ├── model/
-│   │   │               │   ├── Recipe.java
-│   │   │               │   └── RecipeRepository.java
-│   │   │               ├── service/
-│   │   │               │   ├── RecipeService.java
-│   │   │               │   └── RecipeServiceInterface.java
-│   │   │               ├── RecipeManagementSystemApplication.java
-│   │   │               └── ServletInitializer.java
-│   │   └── resources/
-│   │       ├── static/
-│   │       │   ├── css/
-│   │       │   │   └── (various CSS files)
-│   │       │   ├── js/
-│   │       │   │   └── (various JS files)
-│   │       ├── templates/
-│   │       │   ├── edit-recipe.html
-│   │       │   ├── error.html
-│   │       │   ├── home.html
-│   │       │   ├── new-recipe.html
-│   │       │   ├── recipes.html
-│   │       │   └── view-recipe.html
-│   │       └── application.properties
-│   └── test/
-│       └── java/
-│           └── edu/
-│               └── pes/
-│                   └── recipes/
-│                       └── RecipeManagementSystemApplicationTests.java
-│
-├── .mvn/
-│   └── wrapper/
-│       ├── maven-wrapper.jar
-│       └── maven-wrapper.properties
-│
-├── Dockerfile
-│
-├── pipelines/
-│   ├── build.jenkins
-│   └── deployment.jenkins
-│
-├── kubernetes/
-│   └── manifest/
-│       ├── mysql-deployment.yaml
-│       ├── mysql-pv.yaml
-│       ├── mysql-pvc.yaml
-│       ├── mysql-secret.yaml
-│       ├── mysql-service.yaml
-│       ├── namespace.yaml
-│       └── springboot-deployment.yaml
-│       └── springboot-configmap.yaml
-│
-├── .gitignore
-├── README.md
-```
-
-
 # Recipe Management System
 
 The *Recipe Management System* is an MVC web application designed for managing food recipes. It allows users to create, view, edit, and delete recipes, complete with ingredient lists, cooking instructions, and difficulty levels. This guide provides detailed instructions for setting up and deploying the application, integrating it with a MySQL database, and automating the deployment process.
@@ -116,6 +44,7 @@ Build the project using Maven:
 ```bash
 mvn clean install
 ```
+# note: (you will get error in build saying mysql is not configure) [read and use below kubernetes file pv,pvc files to configure mysql and after setting it up again use above "mvn clean install" command.. if mysql is  correctly confurgured then the my build will be successfull]
 
 ### 3. Run the Application
 
@@ -124,14 +53,16 @@ Start the Spring Boot application:
 ```bash
 mvn spring-boot:run
 ```
+#note[you can run application right after mysql build configureation is successfull using avove command]
 
 ### 4. Access the Application
 
 Open your web browser and go to the following URL:
 
-- **Home Page**: [http://localhost:8080/recipes](http://localhost:8080/recipes) *(GET Method)*
+- **Home Page**: [http://localhost:8080/recipes](http://localhost:8080/recipes) *(check port, it might change as per your configuration..the given port is only example)*
 
-## Deployment
+[start]
+## Deployment 
 
 ### 1st Way to Deploy: Using Kubernetes
 
@@ -469,7 +400,7 @@ Here’s an overview of the directory structure for the *Recipe Management Syste
 ```
 recipes/
 │
-├── .github/                  # GitHub-specific configurations (e.g., Actions workflows)
+├──
 │
 ├── src/                      # Source code
 │   ├── main/
@@ -518,3 +449,4 @@ recipes/
 The *Recipe Management System* is a comprehensive solution for managing recipes with a robust backend and intuitive user interface. This guide has walked you through the setup of the application, deployment strategies using Kubernetes and local MySQL, and best practices for DevOps engineering. Following these steps will ensure that your application is properly configured, deployed, and maintained.
 
 # Additional improvement/changes update will be added below.
+
