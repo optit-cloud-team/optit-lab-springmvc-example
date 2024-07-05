@@ -144,7 +144,7 @@ This guide outlines the steps for deploying the *Recipe Management System* using
    Download the official MySQL Docker image:
 
    ```bash
-   docker pull mysql:8.0
+   docker pull mysql:5.7
    ```
 
    You can find more details in the [MySQL Docker Documentation](https://hub.docker.com/_/mysql).
@@ -517,4 +517,4 @@ recipes/
 
 The *Recipe Management System* is a comprehensive solution for managing recipes with a robust backend and intuitive user interface. This guide has walked you through the setup of the application, deployment strategies using Kubernetes and local MySQL, and best practices for DevOps engineering. Following these steps will ensure that your application is properly configured, deployed, and maintained.
 
-#addition improvement/changes update will be added below.
+# Addition improvement/changes update will be added below.
