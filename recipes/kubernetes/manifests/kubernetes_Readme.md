@@ -1,4 +1,4 @@
-Here's the README section for the Kubernetes deployment setup. This section describes how to deploy your application using Kubernetes manifests and provides detailed explanations for each file.
+ This section describes how to deploy your application using Kubernetes manifests and provides detailed explanations for each file.
 
 ---
 
@@ -428,6 +428,3 @@ kubectl get services -n my-namespace
 ---
 
 This section provides the necessary Kubernetes manifests for deploying the Recipe Management System and instructions on how to apply these manifests to set up the environment.
-
-Feel free to adjust any specific details such as image versions, storage sizes, or secrets as per your requirements.
-
