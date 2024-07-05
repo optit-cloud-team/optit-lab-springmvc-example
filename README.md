@@ -26,6 +26,9 @@ The *Recipe Management System* is an MVC web application designed for managing f
 
 ## Setup
 
+![image](https://github.com/optit-cloud-team/optit-lab-springmvc-example/assets/128474801/a6769f0f-b620-4a4a-9e8d-556f9a442346)
+
+
 To set up the *Recipe Management System*, follow these steps:
 
 ### 1. Clone the Repository
