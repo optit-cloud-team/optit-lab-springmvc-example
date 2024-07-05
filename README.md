@@ -1,50 +1,4 @@
 
-# Recipe Management System
-
-*Recipe Management System* is an MVC application that manages food recipes.
-
-## Technology
-
-*Recipe Management System* is using the following technologies:
-
-- Java [version: 8] (the language used to write the application)
-- Maven [version: 3.6] (the tool for managing dependencies and building the project)
-- Spring-Boot [version: 2.2.5.RELEASE] (the framework for creating spring application that just runs)
-- Spring-Boot-Data-JPA [version: 2.2.5.RELEASE] (the dependency for easier access and manipulation of a relational database)
-- Spring-Boot-Thymeleaf [version: 2.3.0 Release] (the Java template engine for both web and standalone environments)
-
-## Setup
-
-Execute the following commands:
-
-- mvn clean install (to build the project)
-- mvn spring-boot:run (to run the project)
-
-Access application in url below:
-
-- http://localhost:8080/recipes [Http method: GET] (home page of recipes application)
-
-### Reference Documentation
-For further reference, please consider the following sections:
-
-* [Official Apache Maven documentation](https://maven.apache.org/guides/index.html)
-* [Spring Boot Maven Plugin Reference Guide](https://docs.spring.io/spring-boot/docs/3.2.4/maven-plugin/reference/html/)
-* [Create an OCI image](https://docs.spring.io/spring-boot/docs/3.2.4/maven-plugin/reference/html/#build-image)
-* [Spring Boot DevTools](https://docs.spring.io/spring-boot/docs/3.2.4/reference/htmlsingle/index.html#using.devtools)
-* [Spring Web](https://docs.spring.io/spring-boot/docs/3.2.4/reference/htmlsingle/index.html#web)
-* [Thymeleaf](https://docs.spring.io/spring-boot/docs/3.2.4/reference/htmlsingle/index.html#web.servlet.spring-mvc.template-engines)
-* [Spring Data JPA](https://docs.spring.io/spring-boot/docs/3.2.4/reference/htmlsingle/index.html#data.sql.jpa-and-spring-data)
-
-### Guides
-The following guides illustrate how to use some features concretely:
-
-* [Building a RESTful Web Service](https://spring.io/guides/gs/rest-service/)
-* [Serving Web Content with Spring MVC](https://spring.io/guides/gs/serving-web-content/)
-* [Building REST services with Spring](https://spring.io/guides/tutorials/rest/)
-* [Handling Form Submission](https://spring.io/guides/gs/handling-form-submission/)
-* [Accessing Data with JPA](https://spring.io/guides/gs/accessing-data-jpa/)
-* [Accessing data with MySQL](https://spring.io/guides/gs/accessing-data-mysql/)
-
 ```
 recipes/
 ├── mvnw
@@ -115,88 +69,147 @@ recipes/
 ├── README.md
 ```
 
+
 # Recipe Management System
 
-The Recipe Management System is a web application designed to streamline the process of managing and sharing food recipes. It provides a user-friendly interface for users to create, view, edit, and delete recipes. With features such as ingredient lists, cooking instructions, and difficulty levels, users can easily organize and access their favorite recipes.
+The *Recipe Management System* is an MVC web application designed for managing food recipes. It allows users to create, view, edit, and delete recipes, complete with ingredient lists, cooking instructions, and difficulty levels. This guide provides detailed instructions for setting up and deploying the application, integrating it with a MySQL database, and automating the deployment process.
 
-## Key Features
+## Table of Contents
 
-- **Recipe CRUD Operations**: Users can perform basic CRUD (Create, Read, Update, Delete) operations on recipes.
-- **User-friendly Interface**: The application offers an intuitive interface for users to navigate and interact with recipes effortlessly.
-- **Thymeleaf Templates**: Utilizing Thymeleaf templates, the frontend is dynamically generated, providing a seamless user experience.
-- **MySQL Integration**: The application integrates with MySQL database to store recipe data securely.
-- **Docker Support**: Dockerization allows for easy deployment and scalability of the application across different environments.
-- **Kubernetes Deployment**: Kubernetes manifests facilitate the deployment and management of the application in a Kubernetes cluster.
-- **Jenkins Pipelines**: Jenkins pipelines automate the build, test, and deployment processes, ensuring efficiency and consistency in the development lifecycle.
+1. [Technology](#technology)
+2. [Setup](#setup)
+3. [Deployment](#deployment)
+   - [1st Way to Deploy: Using Kubernetes](#1st-way-to-deploy-using-kubernetes)
+   - [2nd Way to Deploy: Local MySQL Installation](#2nd-way-to-deploy-local-mysql-installation)
+4. [DevOps Engineering Practices](#devops-engineering-practices)
+5. [File Directory Structure](#file-directory-structure)
+6. [Resources](#resources)
+7. [Summary](#summary)
 
----
-README that includes the steps and resources for setting up MySQL and integrating it with your Recipe Management System. I’ve also included a section for adding your existing files as points:
----
+## Technology
 
-## 1st Way to Deploy: Setting Up MySQL for Recipe Management System
+*Recipe Management System* uses the following technologies:
 
-This guide outlines the steps to set up MySQL, configure it for your Recipe Management System, and integrate it with a Spring Boot application using Kubernetes. Follow these steps to get everything up and running.
+- **Java** [version: 8]: The language used to write the application.
+- **Maven** [version: 3.6]: A tool for managing dependencies and building the project.
+- **Spring Boot** [version: 2.2.5.RELEASE]: The framework for creating and running the Spring application.
+- **Spring Boot Data JPA** [version: 2.2.5.RELEASE]: A library for easier access and manipulation of relational databases.
+- **Spring Boot Thymeleaf** [version: 2.3.0 Release]: A Java template engine for both web and standalone environments.
 
-### Step 1: Pull MySQL Image and Create a Single Instance MySQL Deployment
+## Setup
 
-1. **Pull the MySQL Docker Image**  
-   Use the official MySQL Docker image to create a MySQL instance. Follow these [documentation steps](https://medium.com/@midejoseph24/deploying-mysql-on-kubernetes-16758a42a746) for pulling the image and creating the deployment.
+To set up the *Recipe Management System*, follow these steps:
 
-2. **Create MySQL Kubernetes Resources**  
-   Follow these [Kubernetes guidelines](https://kubernetes.io/docs/tasks/run-application/run-single-instance-stateful-application/) for setting up a single instance MySQL deployment.
+### 1. Clone the Repository
 
-   - **mysql-deployment.yaml**  
-     Defines the MySQL deployment.
-   - **mysql-service.yaml**  
-     Configures the MySQL service with NodePort.
+Clone the GitHub repository to your local machine:
 
-   Place these files in the `optit-lab-springmvc-example/recipes/kubernetes/manifests/` directory:
-   - `mysql-deployment.yaml`
-   - `mysql-service.yaml`
-   - `mysql-secret.yaml` (for storing MySQL credentials)
-   - `mysql-storage.yaml` (for configuring persistent storage)
-   - `mysql-pv.yaml` (for the Persistent Volume)
-   - `mysql-pvc.yaml` (for the Persistent Volume Claim)
+```bash
+git clone https://github.com/your-username/recipes.git
+cd recipes
+```
+
+### 2. Build the Project
+
+Build the project using Maven:
+
+```bash
+mvn clean install
+```
+
+### 3. Run the Application
+
+Start the Spring Boot application:
+
+```bash
+mvn spring-boot:run
+```
+
+### 4. Access the Application
+
+Open your web browser and go to the following URL:
+
+- **Home Page**: [http://localhost:8080/recipes](http://localhost:8080/recipes) *(GET Method)*
+
+## Deployment
+
+### 1st Way to Deploy: Using Kubernetes
+
+This guide outlines the steps for deploying the *Recipe Management System* using Kubernetes with a MySQL database.
+
+#### Step 1: Set Up MySQL
+
+1. **Pull the MySQL Docker Image**
+
+   Download the official MySQL Docker image:
 
    ```bash
-   kubectl apply -f mysql-pv.yaml
-   kubectl apply -f mysql-pvc.yaml
-   kubectl apply -f mysql-deployment.yaml
-   kubectl apply -f mysql-service.yaml
-   kubectl apply -f mysql-secret.yaml
+   docker pull mysql:8.0
    ```
 
-3. **Verify Microservices**  
-   Ensure that all microservices are in the running state after applying the configurations:
+   You can find more details in the [MySQL Docker Documentation](https://hub.docker.com/_/mysql).
+
+2. **Create Kubernetes Resources for MySQL**
+
+   Create the necessary Kubernetes resources for MySQL by applying the following YAML files. These files define the MySQL deployment, service, persistent volume, and other configurations.
+
+   - **mysql-pv.yaml**: Persistent Volume configuration.
+   - **mysql-pvc.yaml**: Persistent Volume Claim configuration.
+   - **mysql-secret.yaml**: Secret for storing MySQL credentials.
+   - **mysql-deployment.yaml**: Deployment configuration for MySQL.
+   - **mysql-service.yaml**: Service configuration to expose MySQL.
+
+   Apply these configurations:
+
+   ```bash
+   kubectl apply -f kubernetes/manifest/mysql-pv.yaml
+   kubectl apply -f kubernetes/manifest/mysql-pvc.yaml
+   kubectl apply -f kubernetes/manifest/mysql-secret.yaml
+   kubectl apply -f kubernetes/manifest/mysql-deployment.yaml
+   kubectl apply -f kubernetes/manifest/mysql-service.yaml
+   ```
+
+3. **Verify MySQL Deployment**
+
+   Check that all MySQL resources are running:
 
    ```bash
    kubectl get pods
    ```
 
-### Step 2: Configure the Spring Boot Application
+   Ensure the MySQL pod is in the `Running` state and the MySQL service has an assigned IP address.
 
-1. **Update Application Properties**  
-   Edit the `application.properties` file to configure the database connection settings:
+#### Step 2: Configure the Spring Boot Application
+
+1. **Update `application.properties`**
+
+   Edit the `application.properties` file in `src/main/resources` to include your MySQL database connection details:
 
    ```properties
    spring.datasource.url=jdbc:mysql://<mysql-service-ip>:<mysql-service-port>/recipe_management
    spring.datasource.username=<your-username>
    spring.datasource.password=<your-password>
+   spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+   spring.jpa.hibernate.ddl-auto=update
    ```
 
-2. **Build the Spring Boot Application**  
-   Use Maven to clean and install the application:
+   Replace `<mysql-service-ip>` and `<mysql-service-port>` with the IP address and port of the MySQL service.
+
+2. **Build the Spring Boot Application**
+
+   Clean and build the application:
 
    ```bash
-   mvn clean install -X
+   mvn clean install
    ```
 
-   Ensure the build is successful. 
+   Ensure there are no build errors.
 
-### Step 3: Create Dockerfile and Build Docker Image
+#### Step 3: Create a Docker Image for the Application
 
-1. **Create a Dockerfile**  
-   Use the Maven snapshot file to create a Dockerfile for your application:
+1. **Create a Dockerfile**
+
+   Create a Dockerfile to define how the application will be containerized:
 
    ```dockerfile
    FROM openjdk:11-jre-slim
@@ -204,168 +217,304 @@ This guide outlines the steps to set up MySQL, configure it for your Recipe Mana
    ENTRYPOINT ["java", "-jar", "/app/your-application.jar"]
    ```
 
+   Ensure that `your-application-snapshot.jar` matches the built JAR file name from Maven.
+
 2. **Build the Docker Image**
 
-   ```bash
-   docker build -t your-application-image:latest .
-   ```
-
-### Step 4: Update Kubernetes Manifests for Spring Boot Application
-
-1. **Add the Docker Image to Kubernetes Manifests**  
-   Update `springboot-deployment.yaml` with the newly created Docker image.
-
-2. **Apply Kubernetes Configurations**  
+   Build the Docker image for the Spring Boot application:
 
    ```bash
-   kubectl apply -f springboot-deployment.yaml
-   kubectl apply -f springboot-service.yaml
-   kubectl apply -f ingress.yaml
+   docker build -t your-dockerhub-username/recipes:latest .
    ```
 
-### Step 5: Create a CI/CD Pipeline for Automation
+   Replace `your-dockerhub-username` with your Docker Hub username.
 
-1. **Set Up a CI/CD Pipeline**  
-   Create a pipeline to automate the build and deployment processes. This includes automating Docker builds and Kubernetes deployments.
+#### Step 4: Update Kubernetes Manifests for Spring Boot Application
 
-   Consider using tools like Jenkins, GitLab CI/CD, or GitHub Actions for this step.
+1. **Update `springboot-deployment.yaml`**
 
-### File Directory Structure
+   Modify the deployment configuration to use the newly built Docker image:
 
-Your Kubernetes manifest files and their purpose:
+   ```yaml
+   apiVersion: apps/v1
+   kind: Deployment
+   metadata:
+     name: springboot-deployment
+   spec:
+     replicas: 1
+     selector:
+       matchLabels:
+         app: springboot
+     template:
+       metadata:
+         labels:
+           app: springboot
+       spec:
+         containers:
+         - name: springboot
+           image: your-dockerhub-username/recipes:latest
+           ports:
+           - containerPort: 8080
+           env:
+           - name: SPRING_DATASOURCE_URL
+             value: jdbc:mysql://mysql-service:3306/recipe_management
+           - name: SPRING_DATASOURCE_USERNAME
+             valueFrom:
+               secretKeyRef:
+                 name: mysql-secret
+                 key: mysql-username
+           - name: SPRING_DATASOURCE_PASSWORD
+             valueFrom:
+               secretKeyRef:
+                 name: mysql-secret
+                 key: mysql-password
+   ```
 
-- **`mysql-storage.yaml`**  
-  - Configuration for MySQL persistent storage.
+2. **Apply Kubernetes Configurations**
 
-- **`mysql-deployment.yaml`**  
-  - Defines the MySQL deployment.
+   Deploy the Spring Boot application and other resources:
 
-- **`mysql-secret.yaml`**  
-  - Contains MySQL credentials.
-
-- **`mysql-service.yaml`**  
-  - Configures the MySQL service.
-
-- **`mysql-pv.yaml`**  
-  - Defines the Persistent Volume for MySQL.
-
-- **`mysql-pvc.yaml`**  
-  - Defines the Persistent Volume Claim for MySQL.
-
-- **`springboot-deployment.yaml`**  
-  - Deployment configuration for the Spring Boot application.
-
-- **`springboot-service.yaml`**  
-  - Service configuration for the Spring Boot application.
-
-- **`ingress.yaml`**  
-  - Configures ingress rules for external access to the application.
-
-### Resources
-
-- [Deploying MySQL on Kubernetes](https://medium.com/@midejoseph24/deploying-mysql-on-kubernetes-16758a42a746)
-- [Kubernetes Single Instance Stateful Application](https://kubernetes.io/docs/tasks/run-application/run-single-instance-stateful-application/)
-
-### Summary
-
-1. Deploy MySQL using the provided documentation.
-2. Configure your `application.properties` file for MySQL.
-3. Build the application and create a Docker image.
-4. Update Kubernetes manifests and deploy the microservices.
-
-By following these steps, you will have a fully deployed MySQL instance and microservices running on Kubernetes.
-
-# 2nd way to deploy[download and install mysql in local machine]
-## DevOps Engineering Practices
-
-As a DevOps engineer, here are key practices to incorporate into the Recipe Management System:
-
-1. **Continuous Integration and Delivery (CI/CD)**: Implement CI/CD pipelines using Jenkins to automate the build, test, and deployment processes. This ensures faster delivery of updates and improvements to the application.
-
-2. **Infrastructure as Code (IaC)**: Define infrastructure components, such as Kubernetes manifests, in code to enable reproducibility and consistency in deployment environments.
-
-3. **Containerization with Docker**: Dockerize the application to encapsulate dependencies and ensure consistency across different environments, from development to production.
-
-4. **Orchestration with Kubernetes**: Utilize Kubernetes for container orchestration, enabling efficient deployment, scaling, and management of containerized applications.
-
-5. **Monitoring and Logging**: Implement monitoring and logging solutions to gain insights into application performance, identify issues, and troubleshoot effectively.
-
-6. **Security Best Practices**: Apply security best practices, such as securing database connections, implementing access controls, and scanning container images for vulnerabilities, to protect the application and its data.
-
-By incorporating these DevOps practices, you can enhance the development, deployment, and operations of the Recipe Management System, ensuring reliability, scalability, and security.
-
-
-### MySQL Installation and Configuration [local einstall and configure]
-
-1. **Install MySQL**: Start by installing MySQL on your system. You can download MySQL Community Server from the official website or use a package manager like Homebrew on macOS or apt on Ubuntu.
-
-2. **Start MySQL Service**: After installation, start the MySQL service on your system. On Unix-based systems, you can do this using the `systemctl` command:
    ```bash
-   systemctl start mysql
+   kubectl apply -f kubernetes/manifest/springboot-deployment.yaml
+   kubectl apply -f kubernetes/manifest/springboot-service.yaml
+   kubectl apply -f kubernetes/manifest/ingress.yaml
    ```
 
-3. **Secure MySQL Installation**: Run the MySQL secure installation script to enhance the security of your MySQL installation. This script prompts you to set a root password, remove anonymous users, disallow root login remotely, and remove the test database.
+3. **Verify the Deployment**
+
+   Check that the Spring Boot application is running and accessible:
+
    ```bash
-   mysql_secure_installation
+   kubectl get pods
+   kubectl get services
    ```
 
-4. **Create Database and User**: Log in to MySQL as the root user and create a database for your Recipe Management System. Also, create a user and grant privileges to that user on the newly created database.
+   Verify that the Ingress is correctly set up and accessible via your public domain.
+
+### 2nd Way to Deploy: Local MySQL Installation
+
+If you prefer to run MySQL on your local machine, follow these steps:
+
+#### Step 1: Install MySQL
+
+1. **Download MySQL**
+
+   Download MySQL Community Server from the [official MySQL website](https://dev.mysql.com/downloads/mysql/).
+
+2. **Install MySQL**
+
+   Follow the installation instructions for your operating system. For Unix-based systems, you can use package managers like Homebrew for macOS or `apt` for Ubuntu.
+
+   ```bash
+   # For macOS using Homebrew
+   brew install mysql
+
+   # For Ubuntu
+   sudo apt update
+   sudo apt install mysql-server
+   ```
+
+3. **Start MySQL Service**
+
+   Start the MySQL service:
+
+   ```bash
+   sudo systemctl start mysql
+   ```
+
+4. **Secure MySQL Installation**
+
+   Run the MySQL secure installation script:
+
+   ```bash
+   sudo mysql_secure_installation
+   ```
+
+   Follow the prompts to set a root password, remove anonymous users, and improve security.
+
+#### Step 2: Create a Database and User
+
+1. **Log in to MySQL**
+
+   Log in to MySQL as the root user:
+
    ```bash
    mysql -u root -p
-
-   mysql> CREATE DATABASE recipes_db;
-   mysql> CREATE USER 'recipes_user'@'%' IDENTIFIED BY 'password';
-   mysql> GRANT ALL PRIVILEGES ON recipes_db.* TO 'recipes_user'@'%';
-   mysql> FLUSH PRIVILEGES;
-   mysql> EXIT;
    ```
 
-5. **Update application.properties**: Update the `application.properties` file in your Spring Boot application's `src/main/resources` directory with the MySQL database connection details.
-   ```properties
-   spring.datasource.url=jdbc:mysql://localhost:3306/recipes_db
-   spring.datasource.username=recipes_user
-   spring.datasource.password=password
-   spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
-   spring.jpa.hibernate.ddl-auto=update
+2. **Create Database and User**
+
+   Execute the following commands to set up the database and user:
+
+   ```sql
+   CREATE DATABASE recipes_db;
+   CREATE USER 'recipes_user'@'localhost' IDENTIFIED BY 'password';
+   GRANT ALL PRIVILEGES ON recipes_db.* TO 'recipes_user'@'localhost';
+   FLUSH PRIVILEGES;
+   EXIT;
    ```
 
-6. **Verify Connection**: Restart your Spring Boot application and verify that it successfully connects to the MySQL database. You can check the console logs for any connection errors.
+   Replace `password` with a strong password of your choice.
 
-### Jenkins Pipeline Setup
+#### Step 3: Update `application.properties`
 
-Now, let's set up Jenkins pipelines for building and deploying your Spring Boot application along with MySQL in Kubernetes.
+Update the `application.properties` file in `src/main/resources` with the local MySQL database connection details:
 
-#### build.jenkins
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/recipes_db
+spring.datasource.username=recipes_user
+spring.datasource.password=password
+spring.datasource
 
-1. **Clone Repository**: Start by cloning your Recipe Management System repository to Jenkins workspace using Git.
+Certainly! Continuing from where we left off:
+
+---
+
+```properties
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.jpa.hibernate.ddl-auto=update
+```
+
+#### Step 4: Run the Application
+
+Build and run the Spring Boot application:
+
+```bash
+mvn clean install
+mvn spring-boot:run
+```
+
+### 3. Access the Application
+
+Open your web browser and go to:
+
+- **Home Page**: [http://localhost:8080/recipes](http://localhost:8080/recipes) *(GET Method)*
+
+## DevOps Engineering Practices
+
+To ensure a robust deployment pipeline and maintain the quality of your application, consider implementing the following DevOps practices:
+
+### Continuous Integration (CI)
+
+1. **Automated Builds**
+
+   Configure a CI server (like Jenkins, GitHub Actions, or GitLab CI) to automatically build your application upon every commit. 
+
+   **Example Jenkins Pipeline Script**:
+
    ```groovy
-   git 'https://github.com/your-username/recipes.git'
+   pipeline {
+       agent any
+       stages {
+           stage('Build') {
+               steps {
+                   script {
+                       sh 'mvn clean install'
+                   }
+               }
+           }
+           stage('Docker Build') {
+               steps {
+                   script {
+                       sh 'docker build -t your-dockerhub-username/recipes:latest .'
+                   }
+               }
+           }
+           stage('Push Docker Image') {
+               steps {
+                   script {
+                       withDockerRegistry([credentialsId: 'dockerhub-credentials', url: 'https://index.docker.io/v1/']) {
+                           sh 'docker push your-dockerhub-username/recipes:latest'
+                       }
+                   }
+               }
+           }
+       }
+   }
    ```
 
-2. **Build Docker Image**: Use the Dockerfile in the repository to build a Docker image for your Spring Boot application.
+### Continuous Deployment (CD)
+
+1. **Automated Deployment**
+
+   Set up a CD pipeline to deploy your Docker image to your Kubernetes cluster:
+
+   **Example Jenkins Pipeline Script**:
+
    ```groovy
-   sh 'docker build -t your-dockerhub-username/recipes:latest .'
+   pipeline {
+       agent any
+       stages {
+           stage('Deploy') {
+               steps {
+                   script {
+                       sh 'kubectl apply -f kubernetes/manifest/springboot-deployment.yaml'
+                       sh 'kubectl apply -f kubernetes/manifest/springboot-service.yaml'
+                       sh 'kubectl apply -f kubernetes/manifest/ingress.yaml'
+                   }
+               }
+           }
+       }
+   }
    ```
 
-3. **Push Docker Image**: Push the built Docker image to Docker Hub to make it accessible for deployment.
-   ```groovy
-   sh 'docker push your-dockerhub-username/recipes:latest'
-   ```
+2. **Monitor and Rollback**
 
-#### deployment.jenkins
+   Implement monitoring tools like Prometheus and Grafana, and establish rollback mechanisms for failed deployments.
 
-1. **Deploy MySQL in Kubernetes**: Apply the MySQL Kubernetes manifests located in the `kubernetes/manifest` directory to deploy MySQL in your Kubernetes cluster. These manifests define resources like Deployment, PersistentVolume, PersistentVolumeClaim, and Service for MySQL.
-   ```groovy
-   sh 'kubectl apply -f kubernetes/manifest/mysql-deployment.yaml'
-   ```
+## File Directory Structure
 
-2. **Deploy Spring Boot Application**: Apply the Kubernetes manifests for your Spring Boot application, including Deployment and Service definitions. These manifests ensure your application is deployed and access
-By incorporating these DevOps practices, you can enhance the development, deployment, and operations of the Recipe Management System, ensuring reliability, scalability, and security.
-ible within the Kubernetes cluster.
-   ```groovy
-   sh 'kubectl apply -f kubernetes/manifest/springboot-deployment.yaml'
-   ```
+Here’s an overview of the directory structure for the *Recipe Management System*:
 
-3. **Verify Deployment**: Check the Kubernetes dashboard or use kubectl commands to verify that both MySQL and your Spring Boot application are successfully deployed and running in the cluster.
+```
+recipes/
+│
+├── .github/                  # GitHub-specific configurations (e.g., Actions workflows)
+│
+├── src/                      # Source code
+│   ├── main/
+│   │   ├── java/             # Java source code
+│   │   │   └── com/
+│   │   │       └── example/
+│   │   │           └── recipes/
+│   │   │               ├── controller/   # Controllers for HTTP requests
+│   │   │               ├── model/         # JPA entities and data models
+│   │   │               ├── repository/    # Repository interfaces for data access
+│   │   │               ├── service/       # Business logic and service classes
+│   │   │               └── RecipeApplication.java  # Main Spring Boot application class
+│   │   └── resources/      # Configuration files and static resources
+│   │       ├── application.properties  # Spring Boot configuration properties
+│   │       └── templates/  # Thymeleaf HTML templates
+│   └── test/               # Test cases
+│
+├── Dockerfile              # Dockerfile for building the Docker image
+├── kubernetes/             # Kubernetes manifests and configuration files
+│   ├── manifest/
+│   │   ├── mysql-deployment.yaml  # MySQL Deployment configuration
+│   │   ├── mysql-pvc.yaml         # MySQL Persistent Volume Claim configuration
+│   │   ├── mysql-pv.yaml          # MySQL Persistent Volume configuration
+│   │   ├── mysql-secret.yaml      # MySQL Secret configuration
+│   │   ├── springboot-deployment.yaml  # Spring Boot Deployment configuration
+│   │   ├── springboot-service.yaml     # Spring Boot Service configuration
+│   │   └── ingress.yaml           # Ingress configuration
+│   └── values.yaml            # Helm chart values file (if using Helm)
+│
+├── .gitignore                # Git ignore file
+├── README.md                 # This README file
+└── pom.xml                   # Maven Project Object Model configuration
+```
 
-By following these steps, you'll have MySQL installed, configured, and integrated with your Spring Boot application, along with Jenkins pipelines set up for building and deploying your application in Kubernetes.
+## Resources
+
+- [Spring Boot Documentation](https://spring.io/projects/spring-boot)
+- [MySQL Docker Documentation](https://hub.docker.com/_/mysql)
+- [Kubernetes Documentation](https://kubernetes.io/docs/home/)
+- [Jenkins Documentation](https://www.jenkins.io/doc/)
+- [Maven Documentation](https://maven.apache.org/guides/index.html)
+- [Docker Documentation](https://docs.docker.com/get-started/)
+
+## Summary
+
+The *Recipe Management System* is a comprehensive solution for managing recipes with a robust backend and intuitive user interface. This guide has walked you through the setup of the application, deployment strategies using Kubernetes and local MySQL, and best practices for DevOps engineering. Following these steps will ensure that your application is properly configured, deployed, and maintained.
+
+#addition improvement/changes update will be added below.
