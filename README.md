@@ -300,10 +300,6 @@ spring.datasource.username=recipes_user
 spring.datasource.password=password
 spring.datasource
 
-Certainly! Continuing from where we left off:
-
----
-
 ```properties
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 spring.jpa.hibernate.ddl-auto=update
