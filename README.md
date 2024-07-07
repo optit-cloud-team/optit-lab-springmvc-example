@@ -449,3 +449,58 @@ The *Recipe Management System* is a comprehensive solution for managing recipes 
 
 # Additional improvement/changes update will be added below.
 
+message: Nothing ther yet to update.
+
+----------------------------------------------------end-------------------------------------
+
+Access RabbitMQ management interface (if applicable):
+Open http://localhost:15672 in your browser and log in with the
+ 
+use default credentials (user name:guest/passwordguest).
+![image](https://github.com/optit-cloud-team/optit-lab-springmvc-example/assets/128474801/05cee7c0-4a39-4a4b-b53d-2b27d817292c)
+
+mysql
+Check MySQL Connection
+To test connectivity to the MySQL service from within the cluster, you can execute a command in a running pod:
+```
+kubectl exec -it <spring-app-pod> -n spring-example -- mysql -h10.10.30.87 -P30006 -uroot -p
+```
+Replace <spring-app-pod> with the name of one of your running Spring Boot application pods.
+
+Check Environment Variables in a Pod
+To view environment variables (including database connection settings) in the Spring Boot pod:
+```
+kubectl exec -it <spring-app-pod> -n spring-example -- printenv
+```
+Replace <spring-app-pod> with the name of one of your running Spring Boot application pods.
+![image](https://github.com/optit-cloud-team/optit-lab-springmvc-example/assets/128474801/4e7e71fb-5cc1-42cf-985d-5d719be0dbbf)
+
+MORE
+```
+# Get MySQL Deployment details
+kubectl get deployment mysql -n spring-example -o yaml
+
+# Get MySQL Service details
+kubectl get service mysql -n spring-example -o yaml
+
+# Get logs for MySQL Pod
+kubectl logs -l app=mysql -n spring-example
+
+# Describe MySQL Deployment
+kubectl describe deployment mysql -n spring-example
+
+# Describe MySQL Service
+kubectl describe service mysql -n spring-example
+
+# Get the NodePort for MySQL Service
+kubectl get service mysql -n spring-example -o=jsonpath='{.spec.ports[0].nodePort}'
+
+# Test MySQL connection from Spring Boot pod
+kubectl exec -it <spring-app-pod> -n spring-example -- mysql -h10.10.30.87 -P30006 -uroot -p
+
+# Check environment variables in the Spring Boot pod
+kubectl exec -it <spring-app-pod> -n spring-example -- printenv
+```
+
+
+# check nodeport Repo next:)
