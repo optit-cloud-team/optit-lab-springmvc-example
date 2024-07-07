@@ -501,6 +501,9 @@ kubectl exec -it <spring-app-pod> -n spring-example -- mysql -h10.10.30.87 -P300
 # Check environment variables in the Spring Boot pod
 kubectl exec -it <spring-app-pod> -n spring-example -- printenv
 ```
+Application.
+
+![image](https://github.com/optit-cloud-team/optit-lab-springmvc-example/assets/128474801/18daa51f-0bcd-4162-aa56-e413b227e917)
 
 
 # check nodeport Repo next:)
