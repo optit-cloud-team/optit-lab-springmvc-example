@@ -25,8 +25,7 @@ The *Recipe Management System* is an MVC web application designed for managing f
 - **Spring Boot Thymeleaf** [version: 2.3.0 Release]: A Java template engine for both web and standalone environments.
 
 ## Setup
-
-![image](https://github.com/optit-cloud-team/optit-lab-springmvc-example/assets/128474801/a6769f0f-b620-4a4a-9e8d-556f9a442346)
+![image](https://github.com/optit-cloud-team/optit-lab-springmvc-example/assets/128474801/b5698edd-bc89-4131-ad33-4bfa85545eea)
 
 
 To set up the *Recipe Management System*, follow these steps:
